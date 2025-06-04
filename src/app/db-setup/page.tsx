@@ -503,29 +503,29 @@ export default function DatabaseSetupPage() {
     }
   ])
 
-  const executeStep = async (step: SetupStep) => {
-    try {
-      const { error } = await supabase.rpc('exec_sql', { 
-        query: step.sql 
-      })
+//   const executeStep = async (step: SetupStep) => {
+//     try {
+//       const { error } = await supabase.rpc('exec_sql', { 
+//         query: step.sql 
+//       })
       
-      if (error) {
-        // Try direct execution if rpc fails
-        const { error: directError } = await supabase
-          .from('__direct_sql_execution__')
-          .select('*')
-          .eq('sql', step.sql)
+//       if (error) {
+//         // Try direct execution if rpc fails
+//         const { error: directError } = await supabase
+//           .from('__direct_sql_execution__')
+//           .select('*')
+//           .eq('sql', step.sql)
         
-        if (directError) {
-          throw new Error(error.message || directError.message)
-        }
-      }
+//         if (directError) {
+//           throw new Error(error.message || directError.message)
+//         }
+//       }
       
-      return { success: true }
-    } catch (error: any) {
-      return { success: false, error: error.message }
-    }
-  }
+//       return { success: true }
+//     } catch (error: any) {
+//       return { success: false, error: error.message }
+//     }
+//   }
 
   const runSetup = async () => {
     setIsRunning(true)
@@ -554,8 +554,9 @@ export default function DatabaseSetupPage() {
 
         updatedSteps[i].completed = true
         updatedSteps[i].error = undefined
-      } catch (error: any) {
-        updatedSteps[i].error = error.message
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+        updatedSteps[i].error = errorMessage
         console.error(`Error in step ${step.name}:`, error)
         // Continue with next steps even if one fails
       }
